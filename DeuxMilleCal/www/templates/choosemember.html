@@ -1,0 +1,44 @@
+<ion-modal-view>
+  <ion-header-bar class="bar bar-header" style="background-color: #2f3541;">
+    <h1 class="title" style="color: white;">Choose member</h1>
+    <button class="button button-clear button-primary" ng-click="modal.hide()" style="color: #989BA1;">Cancel</button>
+  </ion-header-bar>
+  <ion-content style="background-color: #252933;padding-top: 20px;">
+    <div class="bar item-input-inset search-background">
+      <input type="text" placeholder="&#128269;   Search" ng-model="search.member_name" 
+              class="search-element" style="font-size: 18px;color: white;" />
+    </div>
+
+    <p style="margin-top: 5px;margin-left: 10px;font-size: 15px;color: #d8d8d8;">Recent</p>
+
+    <div style="display: inline-flex;width: 100%;margin-left: 20px;margin-right: 20px;">
+      <div style="width: 22%;text-align: center;">
+        <img ng-src="../img/ben.png" style="width: 50px;height: 50px;border-radius: 50px;" />
+        <p style="margin-left: 12px;color: white;">Jack</p>
+      </div>
+      <div style="width: 22%;text-align: center;">
+        <img ng-src="../img/ben.png" style="width: 50px;height: 50px;border-radius: 50px;" />
+        <p style="margin-left: 12px;color: white;">Jack</p>
+      </div>
+      <div style="width: 22%;text-align: center;">
+        <img ng-src="../img/ben.png" style="width: 50px;height: 50px;border-radius: 50px;" />
+        <p style="margin-left: 12px;color: white;">Jack</p>
+      </div>
+      <div style="width: 22%;text-align: center;">
+        <img ng-src="../img/ben.png" style="width: 50px;height: 50px;border-radius: 50px;" />
+        <p style="margin-left: 12px;color: white;">Jack</p>
+      </div>
+    </div>
+
+    <ion-list>
+      <ion-item class="item-thumbnail-left" collection-repeat="x in json_member_result | filter:search" item-height="80px" item-width="100%" ng-click="choose_member(x)" style="height: 80px;" >
+        <img ng-src="{{x.member_avatar}}" style="height: 50px;width: 50px;border-radius: 50px;margin-left: 10px;margin-top: 5px;">
+        <div class="item-text-center item-text-wrap" style="height: 80px;">{{x.member_name}}</div>
+      </ion-item>
+    </ion-list>
+
+    <!-- <ion-infinite-scroll ng-if="listlength<=json_result.length" 
+                on-infinite="loadMore()" distance="3%">
+    </ion-infinite-scroll> -->
+  </ion-content>
+</ion-modal-view>

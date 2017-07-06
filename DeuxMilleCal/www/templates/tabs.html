@@ -1,0 +1,23 @@
+<!--
+Create tabs with an icon and label, using the tabs-positive style.
+Each tab's child <ion-nav-view> directive will have its own
+navigation history that also transitions its views in and out.
+-->
+
+<ion-tabs tabs-type="tabs-icon-only" tabs-style="tabs-positive">
+  <!-- DeuxMille Tab -->
+  <ion-tab title="Cols " icon-on="cols_on" icon-off="cols_off" href="#/tab/deuxmillecols">
+    <ion-nav-view name="tab-deuxmillecols"></ion-nav-view>
+  </ion-tab>
+
+  <!-- Calculation Tab -->
+  <ion-tab title="Calculator" icon-on="calculation_on" icon-off="calculation_off" href="#/tab/calculator">
+    <ion-nav-view name="tab-calculator"></ion-nav-view>
+  </ion-tab>
+
+  <!-- Profile Tab -->
+  <ion-tab title="Profile" icon-on="profile_on" icon-off="profile_off" href="#/tab/profile">
+    <ion-nav-view name="tab-profile"></ion-nav-view>
+  </ion-tab>
+
+</ion-tabs>

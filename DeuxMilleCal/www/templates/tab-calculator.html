@@ -1,0 +1,82 @@
+<ion-view view-title="Calculator">
+  <ion-content>
+    <div style="background-color: #2f3541;height: 230px;margin-top: 2px;">
+      	<p class="top-text">ESTIMATED TIME</p>
+      	<p class="top-time">{{data.timeDisplay}}</p>
+      	<div style="text-align: center;margin-top: 25px;margin-left: 5px;margin-right: 5px;">
+			<div class = "item range range-assertive" style="border: none;">
+				<label style="color: white;font-size: 30px;">-</label>
+	   			<input type = "range" name = "time" min="0" max = "36000" value="{{data.timeSelection}}" ng-model="data.timeSelection">
+	   			<label style="color: white;font-size: 30px;">+</label>
+			</div>
+	    </div>
+	    <div style="margin-top: 15px;text-align: center;">
+	    	<label class="toggle">
+		    	<input type="checkbox" name="">
+		    	<div class="track">
+		    		<div class="handle"></div>
+		    	</div>
+		    </label>
+	    </div>
+    </div>
+    <div style="background-color: #252933;">
+    	<div class = "list">
+    		<div>
+    			<p class="left-top-text">Distance</p>
+    			<p class="right-top-text">{{data.distanceSelection}}m</p>
+			   	<div class="item range" style="border-top-style: none;">
+			   		<label style="color: white;font-size: 20px;">-</label>
+	  				<input type="range" min="0" max="20000" value="{{data.distanceSelection}}" ng-model="data.distanceSelection" ng-change="distanceChange(data.distanceSelection)"/>
+	  				<label style="color: white;font-size: 20px;">+</label>
+				</div>
+			</div>
+			<div>
+    			<p class="left-top-text">Speed</p>
+    			<p class="right-top-text">{{data.speedSelection}}km/h</p>
+			   	<div class = "item range" style="border-top-style: none;">
+			      	<label style="color: white;font-size: 20px;">-</label>
+			      	<input type = "range" min="0" max="50" value="{{data.speedSelection}}" ng-model="data.speedSelection" ng-change="speedChange(data.speedSelection)"/>
+			      	<label style="color: white;font-size: 20px;">+</label>
+			   	</div>
+			</div>
+			<div>
+    			<p class="left-top-text">Watts</p>
+    			<p class="right-top-text">{{data.wattsSelection}}w</p>
+			   	<div class = "item range" style="border-top-style: none;">
+			      	<label style="color: white;font-size: 20px;">-</label>
+			      	<input type = "range" min="0" max="3000" value="{{data.wattsSelection}}" ng-model="data.wattsSelection" ng-change="powerChange(data.wattsSelection)"/>
+			      	<label style="color: white;font-size: 20px;">+</label>
+			   	</div>
+			</div>
+			<div>
+    			<p class="left-top-text">Wind</p>
+    			<p class="right-top-text">{{data.windSelection}}km/h</p>
+			   	<div class = "item range" style="border-style: none;">
+			      	<label style="color: white;font-size: 20px;">-</label>
+			      	<input type = "range" min="0" max="30" value="{{data.windSelection}}" ng-model="data.windSelection" ng-change="windChange(data.windSelection)"/>
+			      	<label style="color: white;font-size: 20px;">+</label>
+			   	</div>
+		   	</div>	
+		   	<div>
+    			<p class="left-top-text">Gradient</p>
+    			<p class="right-top-text">{{data.gradientSelection}}%</p>
+			   	<div class = "item range" style="border-top-style: none;">
+			      	<label style="color: white;font-size: 20px;">-</label>
+			      	<input type = "range" min="0" max="50" value="{{data.gradientSelection}}" ng-model="data.gradientSelection" ng-change="gradientChange(data.gradientSelection)"/>
+			      	<label style="color: white;font-size: 20px;">+</label>
+			   	</div>
+			</div>
+			<div>
+    			<p class="left-top-text">Total weight</p>
+    			<p class="right-top-text">{{data.totalweightSelection}}kg</p>
+			   	<div class = "item range" style="border-style: none;">
+			      	<label style="color: white;font-size: 20px;">-</label>
+			      	<input type = "range" min="0" max="150" value="{{data.totalweightSelection}}" ng-model="data.totalweightSelection" ng-change="weightChange(data.totalweightSelection)"/>
+			      	<label style="color: white;font-size: 20px;">+</label>
+			   	</div>
+		   	</div>	
+		</div>
+
+    </div>
+  </ion-content>
+</ion-view>

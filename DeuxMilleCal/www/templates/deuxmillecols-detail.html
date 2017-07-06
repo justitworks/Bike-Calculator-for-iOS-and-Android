@@ -1,0 +1,134 @@
+<ion-view view-title="{{title}}">
+  <ion-content style="background-color: #252933;">
+
+    <ion-slide-box on-slide-changed="slideChanged(index)">
+      <ion-slide ng-if="flag0">
+        <p class="road-name">
+          {{name0}}
+        </p>
+        <div class="road-detail-1">
+          <div class="road-detail-2">
+            <div class="road-detail-3">
+              <p class="road-element-value">{{altitude0}}</p>
+              <p class="road-element-text">ALTITUDE</p>
+            </div>
+            <div class="road-detail-3">
+              <p class="road-element-value">{{length0}}</p>
+              <p class="road-element-text">LENGTH</p>
+            </div>
+          </div>
+          <div class="road-detail-2">
+            <div class="road-detail-3">
+              <p class="road-element-value">{{vertical0}}</p>
+              <p class="road-element-text">VERTICAL</p>
+            </div>
+            <div class="road-detail-3">
+              <p class="road-element-value">{{avggradient0}}</p>
+              <p class="road-element-text">AVG.GRADIENT</p>
+            </div>
+          </div>
+        </div>
+      </ion-slide>
+      <ion-slide ng-if="flag1">
+        <p class="road-name">
+          {{name1}}
+        </p>
+        <div class="road-detail-1">
+          <div class="road-detail-2">
+            <div class="road-detail-3">
+              <p class="road-element-value">{{altitude1}}</p>
+              <p class="road-element-text">ALTITUDE</p>
+            </div>
+            <div class="road-detail-3">
+              <p class="road-element-value">{{length1}}</p>
+              <p class="road-element-text">LENGTH</p>
+            </div>
+          </div>
+          <div class="road-detail-2">
+            <div class="road-detail-3">
+              <p class="road-element-value">{{vertical1}}</p>
+              <p class="road-element-text">VERTICAL</p>
+            </div>
+            <div class="road-detail-3">
+              <p class="road-element-value">{{avggradient1}}</p>
+              <p class="road-element-text">AVG.GRADIENT</p>
+            </div>
+          </div>
+        </div>
+      </ion-slide>
+      <ion-slide ng-if="flag2">
+        <p class="road-name">
+          {{name2}}
+        </p>
+        <div class="road-detail-1">
+          <div class="road-detail-2">
+            <div class="road-detail-3">
+              <p class="road-element-value">{{altitude2}}</p>
+              <p class="road-element-text">ALTITUDE</p>
+            </div>
+            <div class="road-detail-3">
+              <p class="road-element-value">{{length2}}</p>
+              <p class="road-element-text">LENGTH</p>
+            </div>
+          </div>
+          <div class="road-detail-2">
+            <div class="road-detail-3">
+              <p class="road-element-value">{{vertical2}}</p>
+              <p class="road-element-text">VERTICAL</p>
+            </div>
+            <div class="road-detail-3">
+              <p class="road-element-value">{{avggradient2}}</p>
+              <p class="road-element-text">AVG.GRADIENT</p>
+            </div>
+          </div>
+        </div>
+      </ion-slide>
+      <ion-slide ng-if="flag3">
+        <p class="road-name">
+          {{name3}}
+        </p>
+        <div class="road-detail-1">
+          <div class="road-detail-2">
+            <div class="road-detail-3">
+              <p class="road-element-value">{{altitude3}}</p>
+              <p class="road-element-text">ALTITUDE</p>
+            </div>
+            <div class="road-detail-3">
+              <p class="road-element-value">{{length3}}</p>
+              <p class="road-element-text">LENGTH</p>
+            </div>
+          </div>
+          <div class="road-detail-2">
+            <div class="road-detail-3">
+              <p class="road-element-value">{{vertical3}}</p>
+              <p class="road-element-text">VERTICAL</p>
+            </div>
+            <div class="road-detail-3">
+              <p class="road-element-value">{{avggradient3}}</p>
+              <p class="road-element-text">AVG.GRADIENT</p>
+            </div>
+          </div>
+        </div>
+      </ion-slide>
+    </ion-slide-box>
+
+    <div class="profile-detail-1">
+      <div class="profile-detail-2" style="margin-right: 1px;">
+        <img ng-src={{member_avatar}} class="profile-image" />
+        <p class="profile-ftp">My forecasted time from {{member_ftp}}% of FTP</p>
+        <p class="profile-element-value">{{member_targettime}}</p>
+        <p class="profile-element-text">TARGET TIME</p>
+        <p class="profile-element-value">13.6 kph</p>
+        <p class="profile-element-text">TARGET SPEED</p>
+      </div>
+      <div class="profile-detail-2">
+        <img ng-src={{choose_member_avatar}} ng-click="modal.show()" class="profile-another-image" />
+        <p class="profile-another-text">{{choose_member_name}}</p>
+        <p class="profile-element-value">{{choose_member_time}}</p>
+        <p class="profile-element-text">{{choose_member_time_text}}</p>
+        <p class="profile-element-value">{{choose_member_speed}}</p>
+        <p class="profile-element-text">{{choose_member_speed_text}}</p>
+      </div>
+    </div>
+  </ion-content>
+</ion-view>

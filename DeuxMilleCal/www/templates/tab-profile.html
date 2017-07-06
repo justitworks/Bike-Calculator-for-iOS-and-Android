@@ -1,0 +1,66 @@
+<ion-view view-title="Profile">
+	<ion-nav-buttons side="left">
+	    <a ng-click="logout()" class="left-nav-style">
+	      Log out
+	    </a>
+  	</ion-nav-buttons>
+	<ion-nav-buttons side="right">
+	    <a ng-click="modal.show()" class="right-nav-style">
+	      Edit
+	    </a>
+  	</ion-nav-buttons>
+  	<ion-content style="background-color: #252933;">
+	    <div class="profile3-top-background">
+	    	<img ng-src={{image}} class="profile3-avatar" />
+	    	<div class="profile3-top-inner">
+	    		<p class="profile3-name">{{name}}</p>
+		    	<p class="profile3-country">{{country}}</p>
+		    	<span class="profile3-level">{{level}}</span>
+	    	</div>
+	    </div>
+	    <div class="containerDiv">
+
+			<div class="rowDiv">
+		    	<div class="tablecellDiv1">Conqured cols</div>
+		    	<div class="tablecellDiv2">{{conquredCols}} ></div>
+		  	</div>
+		</div>
+		<div>
+	      <img ng-src="../img/Elements/Banner_jersye.png" class="cols-header" />
+	    </div>	
+
+		<div class="containerDiv">
+
+			<div class="rowDiv">
+		    	<div class="tablecellDiv1">Units</div>
+		    	<div class="tablecellDiv2">{{profile_data.units}}</div>
+		  	</div>
+			  
+			 <div class="rowDiv">
+				<div class="tablecellDiv1">FTP test</div>
+			    <div class="tablecellDiv2">{{profile_data.ftp}}</div>
+			</div>
+
+			<div class="rowDiv">
+			    <div class="tablecellDiv1">Weight</div>
+			    <div class="tablecellDiv2">{{profile_data.weight}} kg</div>
+			</div>
+
+			<div class="rowDiv">
+			    <div class="tablecellDiv1">Bike weight</div>
+			    <div class="tablecellDiv2">{{profile_data.bikeweight}} kg</div>
+			</div>
+
+			<div class="rowDiv">
+			    <div class="tablecellDiv1">PWR</div>
+			    <div class="tablecellDiv2">{{profile_data.pwr}} w</div>
+			</div>
+		</div>
+
+		<div>
+	      <img ng-src="../img/Elements/Banner_website.png" class="cols-header" />
+	    </div>
+    
+  	</ion-content>
+</ion-view>
+

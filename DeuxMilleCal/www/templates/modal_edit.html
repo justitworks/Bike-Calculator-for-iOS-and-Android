@@ -1,0 +1,39 @@
+<ion-modal-view>
+  <ion-header-bar class="bar bar-header" style="background-color: #2f3541;">
+    <button class="button button-clear button-primary" ng-click="modal.hide()" style="color: #989BA1;">Cancel</button>
+    <h1 class="title" style="color: white;">Edit Profile</h1>
+    <button class="button button-clear button-primary" ng-click="savedata()" style="color: #989BA1;">Save</button>
+  </ion-header-bar>
+  <ion-content style="background-color: #252933;padding-top: 20px;">
+    <div class="list">
+      <label class="item item-input" style="background-color: #2f3541;">
+        <span class="input-label" style="color: white;width: 80%;max-width: 500px;">Units</span>
+        <select ng-model="newData.units" style="color: white;background: transparent;border: transparent;font-size: 16px;">
+          <option value="" selected>--Select--</option>
+          <option value="KM">KM</option>
+          <option value="KM1">KM1</option>
+        </select>
+      </label>
+      <label class="item item-input" style="background-color: #2f3541;">
+        <span class="input-label" style="color: white;width: 80%;max-width: 500px;">FTP test</span>
+        <input ng-model="newData.ftp" type="text" style="color: white; font-size: 16px; max-width: 55px;text-align: end;">
+        <span class="" style="color: white;">w</span>
+      </label>
+      <label class="item item-input" style="background-color: #2f3541;">
+        <span class="input-label" style="color: white;width: 80%;max-width: 500px;">Weight</span>
+        <input ng-model="newData.weight" type="text" style="color: white; font-size: 16px; max-width: 55px;text-align: end;">
+        <span class="" style="color: white;">kg</span>
+      </label>
+      <label class="item item-input" style="background-color: #2f3541;">
+        <span class="input-label" style="color: white;width: 80%;max-width: 500px;">Bike Weight</span>
+        <input ng-model="newData.bikeweight" type="text" style="color: white; font-size: 16px; max-width: 55px;text-align: end;">
+        <span class="" style="color: white;">kg</span>
+      </label>
+      <label class="item item-input" style="background-color: #2f3541;">
+        <span class="input-label" style="color: white;width: 80%;max-width: 500px;">PWR</span>
+        <input ng-model="newData.pwr" type="text" style="color: white; font-size: 16px;max-width: 55px;text-align: end;">
+        <span class="" style="color: white;">w</span>
+      </label>
+    </div>
+  </ion-content>
+</ion-modal-view>

@@ -1,0 +1,22 @@
+<ion-view hide-nav-bar="true">
+  <ion-content class="padding" style="background-color: #242933;">
+    <div class="">
+        <img src="../img/Combined Shape.png" class="logo-style"/>
+    </div>
+    <label class="item item-input email-input-style">
+	  <input type="text" placeholder="Email" ng-model="user.email" style="font-size: 21px;color: #ffffff;" />
+	</label>
+	<label class="item item-input password-input-style">
+	  <input placeholder="Password" type="password" ng-model="user.password" style="font-size: 21px;color: #ffffff;"/>
+	</label>
+    <a ng-click="forgot()" style="float: right;margin-top: -80px;margin-right: 20px;">
+        <span style="color: #646871;font-size: 20px;">Forgot?<span/>
+    </a>
+    <a ng-click="login()" style="margin-bottom: 20px;">
+    	<p class="login-1-style">Log In<p/>
+    </a>
+    <a ng-click="login_facebook()" style="color: #D8D8D8;font-size: 17px;">
+    	<p class="login-2-tyle" style="text-align: center;">Log In with Facebook<p/>
+    </a>
+  </ion-content>
+</ion-view
