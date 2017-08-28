@@ -1,33 +1,38 @@
 //var profile_data;
 angular.module('starter.controllers', ['ionic', 'ngCordova', 'ngCordovaOauth'])
 
-    // here functions that are needed globally are defined
+  // here functions that are needed globally are defined
   .run(function($rootScope) {
 
-// function that loads profile data after login
-$rootScope.loadProfileData = function(homeFactory, $state) {
-    var link = 'https://www.clubdeuxmille.com/api/user.get_memberinfo/?user_id=' + $rootScope.userID.toString() + '&insecure=cool';
-    console.log(link);
-    homeFactory
-      .apiCall(link, 'GET')
-      .then(function(response) {
-        var result = response.data;
-        if (result.status == "ok") {
-          $rootScope.profileResults = result;
-          if (result != null) {
-            $rootScope.profile_data = {};
-            $rootScope.profile_data.units = result.units != null ? result.units : '';
-            $rootScope.profile_data.ftp = result.ftp != null ? result.ftp : '';
-            $rootScope.profile_data.weight = result.weight != null ? result.weight : '';
-            $rootScope.profile_data.bikeweight = "15";
-            $rootScope.profile_data.pwr = "30";
+    $rootScope.formatIntegerToTwoDigits = function(val) {
+      return val < 10 ? '0' + val.toString() : val.toString();
+    }
+
+    // function that loads profile data after login
+    $rootScope.loadProfileData = function(homeFactory, $state) {
+      var link = 'http://www.deuxmille.cc/api/user.get_memberinfo/?user_id=' + $rootScope.userID.toString() + '&insecure=cool';
+      console.log(link);
+      homeFactory
+        .apiCall(link, 'GET')
+        .then(function(response) {
+          var result = response.data;
+          if (result.status == "ok") {
+            $rootScope.profileResults = result;
+            if (result != null) {
+              $rootScope.profile_data = {};
+              $rootScope.profile_data.avatar = result.avatar;
+              $rootScope.profile_data.units = result.units != null ? result.units : '';
+              $rootScope.profile_data.ftp = result.ftp != null ? result.ftp : '';
+              $rootScope.profile_data.weight = result.weight != null ? result.weight : '';
+              $rootScope.profile_data.bikeweight = result.bike_weight != null ? result.bike_weight : '';
+              $rootScope.profile_data.pwr = (result.ftp != null && result.weight != null) ? Math.round(parseFloat(result.ftp) / parseFloat(result.weight) * 10) / 10 : '';
+            }
+          } else {
+            alert('No profile data!');
           }
-        } else {
-          alert('No profile data!');
-        }
-        $state.go('tab.deuxmillecols');
-      });
-}
+          $state.go('tab.deuxmillecols');
+        });
+    }
 
     // Newton-Raphson algorithm implementation
     $rootScope.NewtonRaphson = function(a, c, e, d) {
@@ -54,6 +59,46 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
         return vi * 3.6;
       }
     }
+
+    $rootScope.recalculate = function(gradient, ftp, length, weight) {
+      var A = 0.509; //Frontal area
+      var Cd = 0.63; //Drag coefficient
+      var dt = 3; //Drivetrain loss
+      var Crr = 0.005; //Rolling resistance coefficient
+      var rho = 1.056; //Air Density
+      var g = 9.8067; //Gravity
+      var G = parseFloat(gradient);
+      var FG = g * Math.sin(Math.atan(G / 100)) * weight; //Fgravity
+      var FRR = g * Math.cos(Math.atan(G / 100)) * weight * Crr //Frolling-resistance
+      var a = 0.5 * A * Cd * rho;
+      var b = 0;
+      var c = FG + FRR;
+
+      //Method 2 - To calculate Velocity
+      var P = parseFloat(ftp) * 0.9;
+      var vh = 0;
+      var D = parseFloat(length) * 1000;
+      var d = -P * ((1 - (dt / 100)));
+      var e = vh / 3.6;
+
+      var V = $rootScope.NewtonRaphson(a, c, e, d);
+      var temp_V = (V + vh) / 3.6;
+      var FD = a * temp_V * temp_V;
+      var FR = FG + FRR + FD; //Fresist
+
+      var WRK = FR * D; //Work
+      var T = 3.6 * D / V; //Time
+      var time = null;
+      if (V != 0) {
+        time = T;
+      } else {
+        time = 'undefined';
+      }
+      return {
+        speed: V,
+        time: time
+      };
+    }
   })
 
   .controller('LoginCtrl', function($scope, $state, $cordovaOauth, $rootScope, homeFactory) {
@@ -62,7 +107,7 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
 
       $cordovaOauth.facebook("273083806475263", ["email"]).then(function(result) {
         var access_token_res = result.access_token;
-        var link = 'http://www.clubdeuxmille.com/api/user/fb_connect/?access_token=' + access_token_res + '&insecure=cool';
+        var link = 'http://www.deuxmille.cc/api/user/fb_connect/?access_token=' + access_token_res + '&insecure=cool';
         homeFactory
           .facebookCall(link, 'GET')
           .then(function(response) {
@@ -121,6 +166,7 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
                   var result = response.data;
                   if (result.status == "ok") {
                     $rootScope.userID = result.user.id;
+                    $rootScope.authCookie = result.cookie;
                     $rootScope.loadProfileData(homeFactory, $state);
                   } else {
                     alert("User Login failed!")
@@ -144,7 +190,7 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
 
     $rootScope.json_result = [];
 
-    var link = 'http://www.clubdeuxmille.com/api/posts/get_cols_posts/?cols_per_page=-1';
+    var link = 'http://www.deuxmille.cc/api/posts/get_cols_posts/?cols_per_page=-1';
 
     homeFactory
       .colsCall(link, 'GET')
@@ -277,7 +323,10 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
     $scope.slideChanged = function(index) {
       $scope.slideIndex = index;
       // recalculate when slide index changed
-      $scope.recalculate(parseFloat($scope.member_weight));
+      $scope.recalculateForSimul(parseFloat($scope.member_weight), parseFloat($scope.member_ftp), false);
+      if ($scope.choose_member_weight && $scope.choose_member_ftp) {
+        $scope.recalculateForSimul(parseFloat($scope.choose_member_weight), parseFloat($scope.choose_member_ftp), true);
+      }
     };
 
     $scope.choose_member_avatar = "../img/avarta_add.png";
@@ -288,7 +337,7 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
     $scope.choose_member_speed_text = "";
 
     // function for simulation results calculation
-    $scope.recalculate = function(W) {
+    $scope.recalculateForSimul = function(W, ftp, second) {
       var gradient, length;
       if ($scope.slideIndex == 0) {
         gradient = $scope.avggradient0;
@@ -303,36 +352,14 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
         gradient = $scope.avggradient3;
         length = $scope.length3;
       }
-      var A = 0.509; //Frontal area
-      var Cd = 0.63; //Drag coefficient
-      var dt = 3; //Drivetrain loss
-      var Crr = 0.005; //Rolling resistance coefficient
-      var rho = 1.056; //Air Density
-      var g = 9.8067; //Gravity
-      var G = parseFloat(gradient);
-      var FG = g * Math.sin(Math.atan(G / 100)) * W; //Fgravity
-      var FRR = g * Math.cos(Math.atan(G / 100)) * W * Crr //Frolling-resistance
-      var a = 0.5 * A * Cd * rho;
-      var b = 0;
-      var c = FG + FRR;
-
-      //Method 2 - To calculate Velocity
-      var P = parseFloat($scope.member_ftp) * 0.9;
-      var vh = 0;
-      var D = parseFloat(length) * 1000;
-      var d = -P * (1 / (1 - (dt / 100)));
-      var e = vh / 3.6;
-
-      var V = $rootScope.NewtonRaphson(a, c, e, d);
-      var temp_V = (V + vh) / 3.6;
-      var FD = a * temp_V * temp_V;
-      var FR = FG + FRR + FD; //Fresist
-
-      var WRK = FR * D; //Work
-      var T = 3.6 * D / V; //Time
-
-      $scope.timeSelection = T;
-      $scope.member_targetspeed = Math.round(V * 10) / 10;
+      var result = $rootScope.recalculate(gradient, ftp, length, W);
+      if (!second) {
+        $scope.timeSelection = result.time;
+        $scope.member_targetspeed = Math.round(result.speed * 10) / 10 + ' km/h';
+      } else {
+        $scope.timeSelection2 = result.time;
+        $scope.choose_member_speed = Math.round(result.speed * 10) / 10 + ' km/h';
+      }
     }
 
     //Getting self member profile information
@@ -345,13 +372,17 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
       $scope.member_ftp = profileResults.ftp;
       $scope.member_weight = parseFloat(profileResults.weight) + parseFloat(profileResults.bikeweight);
 
-      $scope.recalculate(parseFloat($scope.member_weight));
+      $scope.recalculateForSimul(parseFloat($scope.member_weight), parseFloat($scope.member_ftp), false);
 
       $scope.$watch('timeSelection', function(newValue, oldValue) {
-        var hours = '' + parseInt($scope.timeSelection / 3600);
-        var minutes = '' + parseInt(($scope.timeSelection - hours * 3600) / 60);
-        var seconds = '' + parseInt($scope.timeSelection % 60);
-        $scope.member_targettime = hours + ":" + minutes + ":" + seconds;
+        if (newValue) {
+          var hours = $rootScope.formatIntegerToTwoDigits(parseInt($scope.timeSelection / 3600));
+          var minutes = $rootScope.formatIntegerToTwoDigits(parseInt(($scope.timeSelection - hours * 3600) / 60));
+          var seconds = $rootScope.formatIntegerToTwoDigits(parseInt($scope.timeSelection % 60));
+          $scope.member_targettime = hours + ":" + minutes + ":" + seconds;
+        } else {
+          $scope.member_targettime = 'Undefined time';
+        }
       }, true);
 
     } else {
@@ -361,7 +392,7 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
     //Getting all of member profile information
     $rootScope.show();
     $rootScope.json_member_result = [];
-    var link = 'https://www.clubdeuxmille.com/api/user/get_all_memberinfo/?insecure=cool';
+    var link = 'http://www.deuxmille.cc/api/user/get_all_memberinfo/?insecure=cool';
     homeFactory
       .colsCall(link, 'GET')
       .then(function(response) {
@@ -369,12 +400,27 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
         var result = response.data;
         console.log("all member object info:", result);
         for (var i = 0; i < result.length; i++) {
-          $rootScope.json_member_result.push({
-            member_name: result[i].name,
-            member_avatar: result[i].avatar
-          });
+          if (result[i].ftp && result[i].weight && result[i].bike_weight) {
+            $rootScope.json_member_result.push({
+              member_name: result[i].name,
+              member_avatar: result[i].avatar,
+              member_ftp: result[i].ftp,
+              member_weight: parseFloat(result[i].weight) + 8
+            });
+          }
         }
       });
+
+    $scope.$watch('timeSelection2', function(newValue, oldValue) {
+      if (newValue && newValue != 'undefined') {
+        var hours = $rootScope.formatIntegerToTwoDigits(parseInt($scope.timeSelection2 / 3600));
+        var minutes = $rootScope.formatIntegerToTwoDigits(parseInt(($scope.timeSelection2 - hours * 3600) / 60));
+        var seconds = $rootScope.formatIntegerToTwoDigits(parseInt($scope.timeSelection2 % 60));
+        $scope.choose_member_time = hours + ":" + minutes + ":" + seconds;
+      } else if (newValue == 'undefined') {
+        $scope.choose_member_time = newValue;
+      }
+    }, true);
 
     $ionicModal.fromTemplateUrl('templates/choosemember.html', {
       scope: $scope
@@ -386,10 +432,11 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
       console.log("selected member:", u);
       $scope.choose_member_avatar = u.member_avatar;
       $scope.choose_member_name = u.member_name;
-      $scope.choose_member_time = "00:53:34";
+      $scope.choose_member_weight = u.member_weight;
+      $scope.choose_member_ftp = u.member_ftp;
       $scope.choose_member_time_text = "TARGET TIME";
-      $scope.choose_member_speed = "13.6kph";
       $scope.choose_member_speed_text = "TARGET SPEED";
+      $scope.recalculateForSimul(parseFloat($scope.choose_member_weight), parseFloat($scope.choose_member_ftp), true);
       $scope.modal.hide();
     };
 
@@ -400,7 +447,7 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
 
     $rootScope.json_member_result = [];
 
-    var link = 'https://www.clubdeuxmille.com/api/user/get_memberinfo/?user_id=36';
+    var link = 'http://www.deuxmille.cc/api/user/get_memberinfo/?user_id=36';
     homeFactory
       .colsCall(link, 'GET')
       .then(function(response) {
@@ -447,11 +494,13 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
     $scope.data = {};
     $scope.data.timeSelection = 1000;
 
+    var distanceChanging = true;
+
     $scope.$watch('data.timeSelection', function(newValue, oldValue) {
       if (newValue != null) {
-        var hours = '' + parseInt($scope.data.timeSelection / 3600);
-        var minutes = '' + parseInt(($scope.data.timeSelection - hours * 3600) / 60);
-        var seconds = '' + parseInt($scope.data.timeSelection % 60);
+        var hours = $rootScope.formatIntegerToTwoDigits(parseInt($scope.data.timeSelection / 3600));
+        var minutes = $rootScope.formatIntegerToTwoDigits(parseInt(($scope.data.timeSelection - hours * 3600) / 60));
+        var seconds = $rootScope.formatIntegerToTwoDigits(parseInt($scope.data.timeSelection % 60));
         $scope.data.timeDisplay = hours + ":" + minutes + ":" + seconds;
       } else {
         $scope.data.timeDisplay = 'undefined';
@@ -461,19 +510,21 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
     // click handlers for + or - pressed
     $scope.minusTimeClicked = function() {
       $scope.data.timeSelection = parseFloat($scope.data.timeSelection) - 1;
+      $scope.timeChange($scope.data.timeSelection);
     }
 
     $scope.plusTimeClicked = function() {
       $scope.data.timeSelection = parseFloat($scope.data.timeSelection) + 1;
+      $scope.timeChange($scope.data.timeSelection);
     }
 
     $scope.minusDistanceClicked = function() {
-      $scope.data.distanceSelection = parseFloat($scope.data.distanceSelection) - 1;
+      $scope.data.distanceSelection = parseFloat($scope.data.distanceSelection) - 100;
       $scope.distanceChange($scope.data.distanceSelection);
     }
 
     $scope.plusDistanceClicked = function() {
-      $scope.data.distanceSelection = parseFloat($scope.data.distanceSelection) + 1;
+      $scope.data.distanceSelection = parseFloat($scope.data.distanceSelection) + 100;
       $scope.distanceChange($scope.data.distanceSelection);
     }
 
@@ -532,7 +583,7 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
     $scope.data.gradientSelection = 0;
 
     $scope.$watch('data.distanceSelection', function(newValue) {
-      $scope.data.distanceDisplay = newValue / 1000;
+      $scope.data.distanceDisplay = Math.round(newValue / 1000 * 10) / 10;
     }, true);
 
     $scope.data.seaLevelSelection = false;
@@ -543,7 +594,20 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
       $scope.data.totalweightSelection = $rootScope.profile_data.weight && $rootScope.profile_data.bikeweight ? parseFloat($rootScope.profile_data.weight) + parseFloat($rootScope.profile_data.bikeweight) : 83;
 
       $scope.powerChange($scope.data.wattsSelection);
+      $scope.distanceChange($scope.data.distanceSelection);
     });
+
+    // listener for time change
+    $scope.timeChange = function(val) {
+      if (distanceChanging) {
+        var V = parseFloat($scope.data.distanceSelection) / val * 3.6;
+        $scope.data.speedSelection = Math.round(V * 10) / 10;
+        $scope.speedChange(V);
+      } else {
+        var V = parseFloat($scope.data.speedSelection);
+        $scope.data.distanceSelection = V / 3.6 * parseFloat(val);
+      }
+    }
 
     // listener for sea level / mountain toggle change
     $scope.seaLevelToggleChange = function(val) {
@@ -580,10 +644,11 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
       } else {
         $scope.data.timeSelection = null;
       }
-      $scope.data.wattsSelection = '' + Math.round((1 / (1 - (dt / 100))) * FR * (V / 3.6) * 10) / 10;
+      $scope.data.wattsSelection = '' + Math.round((1 / (1 - (dt / 100)) * FR * (V / 3.6)) * 10) / 10;
     }
 
     $scope.powerChange = function(val) {
+      distanceChanging = false;
       //Basic Calculations
       var W = parseFloat($scope.data.totalweightSelection);
       var G = parseFloat($scope.data.gradientSelection);
@@ -597,7 +662,7 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
       var P = parseFloat(val);
       var vh = parseFloat($scope.data.windSelection);
       var D = parseFloat($scope.data.distanceSelection);
-      var d = -P * (1 / (1 - (dt / 100)));
+      var d = -P * ((1 - (dt / 100)));
       var e = vh / 3.6;
 
       var V = $rootScope.NewtonRaphson(a, c, e, d);
@@ -613,6 +678,7 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
     }
 
     $scope.distanceChange = function(val) {
+      distanceChanging = true;
       var V = parseFloat($scope.data.speedSelection);
       var D = parseFloat(val);
       var T = 3.6 * D / V; //Time
@@ -630,7 +696,7 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
       var P = parseFloat($scope.data.wattsSelection);
       var vh = parseFloat($scope.data.windSelection);
       var D = parseFloat($scope.data.distanceSelection);
-      var d = -P * (1 / (1 - (dt / 100)));
+      var d = -P * (1 - (dt / 100));
       var e = vh / 3.6;
 
       var V = $rootScope.NewtonRaphson(a, c, e, d);
@@ -664,7 +730,7 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
       var T = 3.6 * D / V; //Time
 
       $scope.data.timeSelection = T;
-      $scope.data.wattsSelection = '' + Math.round((1 / (1 - (dt / 100))) * FR * (V / 3.6) * 10) / 10;
+      $scope.data.wattsSelection = '' + Math.round((1 / (1 - (dt / 100)) * FR * (V / 3.6)) * 10) / 10;
     }
 
     $scope.weightChange = function(val) {
@@ -680,7 +746,7 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
       var P = parseFloat($scope.data.wattsSelection);
       var vh = parseFloat($scope.data.windSelection);
       var D = parseFloat($scope.data.distanceSelection);
-      var d = -P * (1 / (1 - (dt / 100)));
+      var d = -P * ((1 - (dt / 100)));
       var e = vh / 3.6;
 
       var V = $rootScope.NewtonRaphson(a, c, e, d);
@@ -697,7 +763,7 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
 
   })
 
-  .controller('ProfileCtrl', function($scope, $rootScope, $ionicModal, homeFactory) {
+  .controller('ProfileCtrl', function($scope, $rootScope, $ionicModal, $state, homeFactory) {
 
     //Getting self member profile information
     $rootScope.show();
@@ -706,7 +772,7 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
     if (result.status == "ok") {
       $scope.image = result.avatar;
       $scope.name = result.name;
-      $scope.country = result.nickname;
+      $scope.country = result.country;
       $scope.level = result.user_col_level;
       $scope.conquredCols_data = result.user_cols_data;
       $scope.conquredCols = result.user_cols_data != null ? result.user_cols_data.length : 0;
@@ -716,6 +782,9 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
 
     $scope.logout = function() {
       console.log('logout click!');
+      $rootScope.userID = '';
+      $rootScope.profile_data = {};
+      $state.go('login');
     }
 
     // profile data now is set in the beginning
@@ -727,11 +796,12 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
     // $rootScope.profile_data.pwr = "30";
 
     $scope.newData = {
-      units: '',
-      ftp: '',
-      weight: '',
-      bikeweight: '',
-      pwr: ''
+      avatar: $rootScope.profile_data.avatar,
+      units: $rootScope.profile_data.units,
+      ftp: $rootScope.profile_data.ftp,
+      weight: $rootScope.profile_data.weight,
+      bikeweight: $rootScope.profile_data.bikeweight,
+      pwr: $rootScope.profile_data.pwr
     };
 
     $ionicModal.fromTemplateUrl('templates/modal_edit.html', {
@@ -740,8 +810,28 @@ $rootScope.loadProfileData = function(homeFactory, $state) {
       $scope.modal = modal;
     });
 
+    $scope.updatePwr = function(ftp, weight) {
+      if (ftp && ftp.length > 0 && weight && weight.length > 0) {
+        $scope.newData.pwr = Math.round(parseFloat(ftp) / parseFloat(weight) * 10) / 10;
+      } else {
+        $scope.newData.pwr = '';
+      }
+    };
+
     $scope.savedata = function() {
       $rootScope.profile_data = $scope.newData;
+      var link = 'http://www.deuxmille.cc/api/user/update_user_meta_vars/?cookie=' + $rootScope.authCookie +
+        //'&jsf_units=' + $rootScope.profile_data.units +
+        '&jsf_ftp=' + $rootScope.profile_data.ftp +
+        '&jsf_weight=' + $rootScope.profile_data.weight +
+        '&jsf_bike_weight=' + $rootScope.profile_data.bikeweight + '&insecure=cool';
+      homeFactory.apiCall(link, 'GET').then(function(response) {
+        if (response.data.status == 'ok') {
+          alert('Profile data was successfully updated');
+        } else {
+          alert('Update error!');
+        }
+      })
       $scope.modal.hide();
     };
 

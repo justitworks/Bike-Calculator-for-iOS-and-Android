@@ -1,15 +1,15 @@
 <ion-view view-title="Deux Mille cols">
   <ion-content class="has-header" style="background-color: #252933;">
     <div class="bar item-input-inset search-background">
-      <input type="text" placeholder="&#128269;   Search" ng-model="search.cols_title" 
+      <input type="text" placeholder="&#128269;   Search" ng-model="search.cols_title"
               class="search-element" style="color: white;font-size: 20px;" />
     </div>
     <div>
       <img ng-src="../img/Elements/Banner_jersye.png" class="cols-header" />
     </div>
     <ion-list>
-      <ion-item type="item-text-wrap" 
-                ng-repeat="item in json_result | filter:search | limitTo:listlength" 
+      <ion-item type="item-text-wrap"
+                ng-repeat="item in json_result | orderBy:'-altitude0' | filter:search | limitTo:listlength"
                 item="item"
                 ng-click="item_click(item)" class="item-style">
         {{ item.cols_title }}
@@ -17,7 +17,7 @@
 
     </ion-list>
 
-    <ion-infinite-scroll ng-if="listlength<=json_result.length" 
+    <ion-infinite-scroll ng-if="listlength<=json_result.length"
             on-infinite="loadMore()" distance="3%">
     </ion-infinite-scroll>
   </ion-content>

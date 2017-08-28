@@ -6,7 +6,7 @@
       <div style="text-align: center;margin-top: 25px;margin-left: 5px;margin-right: 5px;">
         <div class="item range range-assertive" style="border: none;">
           <label style="color: white;font-size: 30px;" ng-click="minusTimeClicked()">-</label>
-          <input type="range" name="time" min="0" step="1" max="36000" value="{{data.timeSelection}}" ng-model="data.timeSelection">
+          <input type="range" name="time" min="0" step="1" max="36000" value="{{data.timeSelection}}" ng-model="data.timeSelection" ng-change="timeChange(data.timeSelection)">
           <label style="color: white;font-size: 30px;" ng-click="plusTimeClicked()">+</label>
         </div>
       </div>
@@ -30,7 +30,7 @@
           <p class="right-top-text">{{data.distanceDisplay}} km</p>
           <div class="item range" style="border-top-style: none;">
             <label style="color: white;font-size: 20px;" ng-click="minusDistanceClicked()">-</label>
-            <input type="range" min="0" max="50000" value="{{data.distanceSelection}}" ng-model="data.distanceSelection" ng-change="distanceChange(data.distanceSelection)" />
+            <input type="range" min="0" max="50000" step="100" value="{{data.distanceSelection}}" ng-model="data.distanceSelection" ng-change="distanceChange(data.distanceSelection)" />
             <label style="color: white;font-size: 20px;" ng-click="plusDistanceClicked()">+</label>
           </div>
         </div>

@@ -69,6 +69,7 @@ angular.module('starter.routes', [])
 
   .state('tab.profile', {
     url: '/profile',
+    cache: false,
     views: {
       'tab-profile': {
         templateUrl: 'templates/tab-profile.html',

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.ionicframework.deuxmillecal443587" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.ionicframework.deuxmillecal443588" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>DeuxMilleCal</name>
     <description>
         An Ionic Framework and Cordova project.
@@ -73,5 +73,11 @@
         <splash density="port-xxxhdpi" src="resources/android/splash/drawable-port-xxxhdpi-screen.png" />
     </platform>
     <allow-navigation href="http://192.168.2.130:8100" />
-    <engine name="android" spec="^6.2.3" />
+    <allow-navigation href="http://*/*" />
+    <allow-navigation href="https://*/*" />
+    <allow-navigation href="data:*" />
+    <allow-navigation href="file:///*/*" />
+    <engine name="ios" spec="^4.4.0" />
+    <plugin name="cordova-plugin-inapppurchase" spec="^1.1.0" />
+    <plugin name="cordova-plugin-whitelist" spec="~1.3.2" />
 </widget>
