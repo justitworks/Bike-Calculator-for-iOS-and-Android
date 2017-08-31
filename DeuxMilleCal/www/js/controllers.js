@@ -329,7 +329,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova', 'ngCordovaOauth'])
       }
     };
 
-    $scope.choose_member_avatar = "../img/avarta_add.png";
+    $scope.choose_member_avatar = "img/avarta_add.png";
     $scope.choose_member_name = "Compare to another rider";
     $scope.choose_member_time = "";
     $scope.choose_member_time_text = "";
@@ -389,6 +389,22 @@ angular.module('starter.controllers', ['ionic', 'ngCordova', 'ngCordovaOauth'])
       alert("User Login failed!")
     }
 
+    $ionicModal.fromTemplateUrl('templates/modal_rate.html', {
+      scope: $scope
+    }).then(function(modal) {
+      $scope.modalRate = modal;
+      $scope.currentColName = '';
+      if ($scope.slideIndex == 0) {
+        $scope.currentColName = $scope.name0;
+      } else if ($scope.slideIndex == 1) {
+        $scope.currentColName = $scope.name1;
+      } else if ($scope.slideIndex == 2) {
+        $scope.currentColName = $scope.name2;
+      } else if ($scope.slideIndex == 3) {
+        $scope.currentColName = $scope.name3;
+      }
+    });
+
     //Getting all of member profile information
     $rootScope.show();
     $rootScope.json_member_result = [];
@@ -400,15 +416,31 @@ angular.module('starter.controllers', ['ionic', 'ngCordova', 'ngCordovaOauth'])
         var result = response.data;
         console.log("all member object info:", result);
         for (var i = 0; i < result.length; i++) {
-          if (result[i].ftp && result[i].weight && result[i].bike_weight) {
+          if (result[i].ftp && result[i].weight && result[i].bike_weight && result[i].user_col_level) {
             $rootScope.json_member_result.push({
               member_name: result[i].name,
               member_avatar: result[i].avatar,
               member_ftp: result[i].ftp,
-              member_weight: parseFloat(result[i].weight) + 8
+              member_weight: parseFloat(result[i].weight) + 8,
+              member_cat: result[i].user_col_level
             });
           }
         }
+        $rootScope.json_member_result.sort(function(a) {
+          return parseInt(a.member_cat.split(' ')[1]);
+        });
+        for (var i = 0; i < result.length; i++) {
+          if (result[i].ftp && result[i].weight && result[i].bike_weight && result[i].user_col_level == '') {
+            $rootScope.json_member_result.push({
+              member_name: result[i].name,
+              member_avatar: result[i].avatar,
+              member_ftp: result[i].ftp,
+              member_weight: parseFloat(result[i].weight) + 8,
+              member_cat: result[i].user_col_level
+            });
+          }
+        }
+        console.log($rootScope.json_member_result);
       });
 
     $scope.$watch('timeSelection2', function(newValue, oldValue) {
@@ -779,6 +811,10 @@ angular.module('starter.controllers', ['ionic', 'ngCordova', 'ngCordovaOauth'])
     } else {
       alert("User Login failed!");
     }
+
+    // $scope.goToColsList = function() {
+    //     sta
+    // }
 
     $scope.logout = function() {
       console.log('logout click!');

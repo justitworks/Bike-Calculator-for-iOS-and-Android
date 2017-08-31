@@ -158,7 +158,6 @@ div.tab-nav, .tabs {
 
 .search-element{
 	width:100%;
-	height: 40px;
 	text-align: center;
 	font-size: 15px;
 	background-color: #1b1f26;
@@ -353,7 +352,7 @@ div.tab-nav, .tabs {
 .profile3-avatar{
 	width: 80px;
 	height: 80px;
-    border-radius: 50px;
+    border-radius: 40px;
     margin-left: 15px;
     margin-top: 15px;
 }
