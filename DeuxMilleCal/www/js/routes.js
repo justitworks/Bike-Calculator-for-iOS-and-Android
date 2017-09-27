@@ -76,6 +76,17 @@ angular.module('starter.routes', [])
         controller: 'ProfileCtrl'
       }
     }
+  })
+
+  .state('tab.usercolslist', {
+     url: '/usercolslist',
+     cache: false,
+     views: {
+         'tab-profile': {
+             templateUrl: 'templates/usercols_list.html',
+             controller: 'UserColsCtrl'
+         }
+     }
   });
 
   // if none of the above states are matched, use this as the fallback

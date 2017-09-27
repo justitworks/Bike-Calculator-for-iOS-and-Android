@@ -71,6 +71,10 @@ div.tab-nav, .tabs {
     margin-top: 30vh;
 }
 
+.logo-style-email {
+  margin-top: 20vh;
+}
+
 .facebook-login-background{
     margin-left: 7vw;
     width: 80vw;
@@ -361,7 +365,7 @@ div.tab-nav, .tabs {
 	margin-top: 20px;
     margin-left: 20px;
     margin-right: 20px;
-    width: 80vw;
+    /*width: 80vw;*/
 }
 
 .profile3-name{
