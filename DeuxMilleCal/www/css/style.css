@@ -4,6 +4,11 @@
     background-image: linear-gradient(0deg, #2F3541, #2F3541 1%, transparent 1%)!important;
 }
 
+input:focus::-webkit-input-placeholder { color:transparent; }
+input:focus:-moz-placeholder { color:transparent; } /* Firefox 18- */
+input:focus::-moz-placeholder { color:transparent; } /* Firefox 19+ */
+input:focus:-ms-input-placeholder { color:transparent; } /* oldIE ;) */
+
 div.tab-nav, .tabs {
     background-color: #2F3541;
 }
@@ -64,21 +69,27 @@ div.tab-nav, .tabs {
 
 /*Login page CSS*/
 
+.logoDiv {
+    text-align: center;
+    margin-top: 10vh;
+}
+
+.logoDivEmail {
+    text-align: center;
+}
+
 .logo-style{
-	width: 65px;
-    height: 60px;
-    margin-left: 42vw;
-    margin-top: 30vh;
+	width: 300px;
+    height: 300px;
 }
 
 .logo-style-email {
-  margin-top: 20vh;
 }
 
 .facebook-login-background{
     margin-left: 7vw;
     width: 80vw;
-    margin-top: 30vh;
+    margin-top: 15vh;
     height: 50px;
     line-height: 50px;
     background-color: #4867AB;
@@ -109,7 +120,6 @@ div.tab-nav, .tabs {
 /*Email Login page CSS*/
 
 .email-input-style{
-	margin-top: 20vh;
 	margin-bottom: 10px;
 	font-size: 20px;
 	width: 90%;
@@ -180,7 +190,6 @@ div.tab-nav, .tabs {
 
 .cols-header{
 	width: 100%;
-    height: 115px;
     padding-top: 17px;
     padding-bottom: 16px;
 }
@@ -446,7 +455,7 @@ div.tab-nav, .tabs {
 
 .top-time{
 	text-align: center;
-    font-size: 40px;
+    font-size: 28px;
     margin-top: 20px;
     color: white;
 }

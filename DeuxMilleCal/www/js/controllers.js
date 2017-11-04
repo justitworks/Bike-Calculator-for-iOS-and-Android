@@ -55,29 +55,50 @@ angular.module('starter.controllers', ['ionic', 'ngCordova', 'ngCordovaOauth'])
                             $rootScope.profile_data.weight = result.weight != null ? result.weight : '';
                             $rootScope.profile_data.bikeweight = result.bike_weight != null ? result.bike_weight : '';
                             $rootScope.profile_data.pwr = (result.ftp != null && result.weight != null) ? Math.round(parseFloat(result.ftp) / parseFloat(result.weight) * 10) / 10 : '';
+                            $rootScope.profile_data.name = result.name;
                             $rootScope.checkProfileData($ionicModal);
                         }
                     } else {
-                        alert('No profile data!');
+                        navigator.notification.alert('No profile data!', function () {
+                        }, 'Error');
                     }
                     $state.go('tab.deuxmillecols');
                 });
+        }
 
             $rootScope.synchronizeWithStrava = function () {
-                var syncBool = confirm('Do you want to synchronize data with Strava?');
-                if (syncBool == true) {
-                    var linkTokenSynchronize = 'http://www.deuxmille.cc/api/user/update_user_strava/?insecure=cool&user_id=' + $rootScope.userID.toString();
-                    homeFactory.apiCall(linkTokenSynchronize, 'GET').then(function (response) {
-                        var result = response.data;
-                        if (result.status = 'success') {
-                            alert('Your data was successfully synchronized.')
+                NativeStorage.getItem('strava_synchronization_' + $rootScope.userID.toString(), function (val) {
+                    if (val) {
+                        var linkTokenSynchronize = 'http://www.deuxmille.cc/api/user/update_user_strava/?insecure=cool&user_id=' + $rootScope.userID.toString();
+                        homeFactory.apiCall(linkTokenSynchronize, 'GET').then(function (response) {
+                            var result = response.data;
+                            if (result.status = 'success') {
+                                navigator.notification.alert('Your data was successfully synchronized.', function () {
+                                }, 'Key data');
+                            } else {
+                                navigator.notification.alert('Error happened during synchronization.', function () {
+                                }, 'Error');
+                            }
+                        });
+                    }
+                }, function () {
+                    navigator.notification.confirm('Do you want to synchronize data with Strava?', function (buttonIndex) {
+                        if (buttonIndex == 1) {
+                            NativeStorage.setItem('strava_synchronization_' + $rootScope.userID.toString(), true, function (success) {
+                                console.log("Successful setting into storage.");
+                            }, function (error) {
+                                console.log("Error while setting into storage.");
+                            });
                         } else {
-                            alert('Error happened during synchronization.');
+                            NativeStorage.setItem('strava_synchronization_' + $rootScope.userID.toString(), false, function (success) {
+                                console.log("Successful setting into storage.");
+                            }, function (error) {
+                                console.log("Error while setting into storage.");
+                            });
                         }
-                    });
-                }
+                    }, 'Key data', ['OK', 'Cancel']);
+                });
             }
-        }
 
         // Newton-Raphson algorithm implementation
         $rootScope.NewtonRaphson = function (a, c, e, d) {
@@ -155,7 +176,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova', 'ngCordovaOauth'])
                 pwr: $rootScope.profile_data.pwr
             };
             if (!($rootScope.profile_data.ftp && $rootScope.profile_data.weight && $rootScope.profile_data.bikeweight)) {
-                alert('Please fill all necessary profile data to continue');
+                navigator.notification.alert('Please fill all necessary profile data to continue', function() {}, 'Error');
                 $ionicModal.fromTemplateUrl('templates/modal_edit.html', {
                     scope: $rootScope
                 }).then(function (modal) {
@@ -167,7 +188,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova', 'ngCordovaOauth'])
 
         $rootScope.dismissEditDialog = function () {
             if (!($rootScope.profile_data.ftp && $rootScope.profile_data.weight && $rootScope.profile_data.bikeweight)) {
-                alert('Please fill all the data!');
+                navigator.notification.alert('Please fill all the data!', function() {}, 'Error');
             } else {
                 $rootScope.modal.hide();
             }
@@ -175,7 +196,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova', 'ngCordovaOauth'])
 
         $rootScope.savedata = function () {
             if (!($rootScope.newData.ftp && $rootScope.newData.weight && $rootScope.newData.bikeweight)) {
-                alert('Please fill all the data!');
+                navigator.notification.alert('Please fill all the data!', function() {}, 'Error');
             } else {
                 $rootScope.profile_data = $rootScope.newData;
                 var link = 'http://www.deuxmille.cc/api/user/update_user_meta_vars/?cookie=' + $rootScope.authCookie +
@@ -185,9 +206,9 @@ angular.module('starter.controllers', ['ionic', 'ngCordova', 'ngCordovaOauth'])
                     '&jsf_bike_weight=' + $rootScope.profile_data.bikeweight + '&insecure=cool';
                 homeFactory.apiCall(link, 'GET').then(function (response) {
                     if (response.data.status == 'ok') {
-                        alert('Profile data was successfully updated');
+                        navigator.notification.alert('Profile data was successfully updated', function() {}, 'Information');
                     } else {
-                        alert('Update error!');
+                        navigator.notification.alert('Update error!', function() {}, 'Error');
                     }
                 })
                 $rootScope.modal.hide();
@@ -197,6 +218,17 @@ angular.module('starter.controllers', ['ionic', 'ngCordova', 'ngCordovaOauth'])
     })
 
     .controller('LoginCtrl', function ($scope, $state, $ionicModal, $cordovaOauth, $rootScope, homeFactory) {
+
+        NativeStorage.getItem('user_auth', function (val) {
+            if (val.id && val.cookie) {
+                $rootScope.userID = val.id;
+                $rootScope.authCookie = val.cookie;
+                $rootScope.loadProfileData(homeFactory, $state, $ionicModal);
+                $rootScope.synchronizeWithStrava();
+                $state.go('tab.deuxmillecols');
+            }
+        }, function () {
+        });
 
         $scope.facebooklogin = function () {
 
@@ -208,10 +240,20 @@ angular.module('starter.controllers', ['ionic', 'ngCordova', 'ngCordovaOauth'])
                     .then(function (response) {
                         $scope.facebook_res = response.data;
                         $rootScope.userID = response.data.wp_user_id;
+                        $rootScope.authCookie = response.data.cookie;
+                        NativeStorage.setItem('user_auth', {
+                            id: $rootScope.userID,
+                            cookie: $rootScope.authCookie
+                        }, function (success) {
+                            console.log("Successful setting into storage.");
+                        }, function (error) {
+                            console.log("Error while setting into storage.");
+                        });
                         $rootScope.loadProfileData(homeFactory, $state, $ionicModal);
+                        $rootScope.synchronizeWithStrava();
                     })
             }, function (error) {
-                alert("Auth Failed..!!" + error);
+                navigator.notification.alert('Auth Failed..!!' + error, function() {}, 'Error');
             });
         }
 
@@ -247,7 +289,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova', 'ngCordovaOauth'])
             console.log('password:', $scope.user.password);
 
             if ($scope.user.email.length == 0 || $scope.user.password.length == 0) {
-                alert("email or password is not specified.")
+                navigator.notification.alert('Email or password is not specified.', function() {}, 'Error');
             } else {
 
                 $rootScope.show();
@@ -260,7 +302,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova', 'ngCordovaOauth'])
                         console.log(response);
                         if (response.data.status == "ok") {
 
-                            var link = 'https://www.deuxmille.cc/api/user/generate_auth_cookie/?username=' + $scope.user.email + '&password=' + $scope.user.password + '&insecure=cool';
+                            var link = 'http://www.deuxmille.cc/api/user/generate_auth_cookie/?username=' + $scope.user.email + '&password=' + $scope.user.password + '&insecure=cool';
 
                             homeFactory
                                 .apiCall(link, 'GET')
@@ -269,6 +311,14 @@ angular.module('starter.controllers', ['ionic', 'ngCordova', 'ngCordovaOauth'])
                                     if (result.status == "ok") {
                                         $rootScope.userID = result.user.id;
                                         $rootScope.authCookie = result.cookie;
+                                        NativeStorage.setItem('user_auth', {
+                                            id: $rootScope.userID,
+                                            cookie: $rootScope.authCookie
+                                        }, function (success) {
+                                            console.log("Successful setting into storage.");
+                                        }, function (error) {
+                                            console.log("Error while setting into storage.");
+                                        });
                                         $rootScope.loadProfileData(homeFactory, $state, $ionicModal);
                                         $rootScope.synchronizeWithStrava();
                                         NativeStorage.setItem('loginCredentials', {
@@ -278,7 +328,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova', 'ngCordovaOauth'])
                                         }, function () {
                                         });
                                     } else {
-                                        alert("User Login failed!")
+                                        navigator.notification.alert('User Login failed!', function() {}, 'Error');
                                     }
                                 });
                         }
@@ -479,6 +529,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova', 'ngCordovaOauth'])
             $scope.member_avatar = profileResults.avatar;
             $scope.member_ftp = profileResults.ftp;
             $scope.member_weight = parseFloat(profileResults.weight) + parseFloat(profileResults.bikeweight);
+            $scope.member_name = profileResults.name;
 
             $scope.recalculateForSimul(parseFloat($scope.member_weight), parseFloat($scope.member_ftp), false);
 
@@ -494,7 +545,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova', 'ngCordovaOauth'])
             }, true);
 
         } else {
-            alert("User Login failed!")
+            navigator.notification.alert('User Login failed!', function() {}, 'Error');
         }
 
         $ionicModal.fromTemplateUrl('templates/modal_rate.html', {
@@ -934,7 +985,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova', 'ngCordovaOauth'])
             $scope.country = result.country;
             $scope.level = result.user_col_level;
         } else {
-            alert("User Login failed!");
+            navigator.notification.alert('User Login failed!', function() {}, 'Error');
         }
 
         $scope.goToColsList = function () {
@@ -943,7 +994,12 @@ angular.module('starter.controllers', ['ionic', 'ngCordova', 'ngCordovaOauth'])
 
         $scope.logout = function () {
             console.log('logout click!');
-            $rootScope.userID = '';
+            NativeStorage.remove('user_auth', function () {
+                console.log('Successfully removed from storage');
+            }, function (error) {
+                console.log(error);
+
+            });
             $rootScope.profile_data = {};
             $state.go('login');
         }
@@ -971,7 +1027,9 @@ angular.module('starter.controllers', ['ionic', 'ngCordova', 'ngCordovaOauth'])
             $rootScope.modal = modal;
         });
 
-        $scope.updatePwr = function (ftp, weight) {
+        $rootScope.updatePwr = function () {
+            var ftp = $rootScope.newData.ftp;
+            var weight = $rootScope.newData.weight;
             if (ftp && ftp.length > 0 && weight && weight.length > 0) {
                 $rootScope.newData.pwr = Math.round(parseFloat(ftp) / parseFloat(weight) * 10) / 10;
             } else {
@@ -984,6 +1042,6 @@ angular.module('starter.controllers', ['ionic', 'ngCordova', 'ngCordovaOauth'])
 
 
         $scope.showColDetails = function (col) {
-            alert('Time: ' + col.col_time + '\nDate: ' + col.col_date);
+            navigator.notification.alert('Time: ' + col.col_time + '\nDate: ' + col.col_date, function() {}, 'Information');
         }
     });
